@@ -31,7 +31,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: password
         ports:
           - 3306:3306
 
@@ -47,6 +47,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Wait for MySQL service ready
+        run: sleep 15
 
       - name: Generate coverage report
         run: |
