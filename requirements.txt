@@ -7,4 +7,5 @@ mypy
 coverage
 
 # 3rd party packages for useiing
+cryptography
 PyMySQL
