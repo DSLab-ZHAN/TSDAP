@@ -27,7 +27,7 @@ def connect_mysql():
         'localhost',
         3306,
         'root',
-        '20041123'
+        'root'
     )
 
     correct_data = json.load(open("tests/database/data/correct.json"))
