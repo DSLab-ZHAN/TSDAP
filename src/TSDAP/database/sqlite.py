@@ -12,12 +12,11 @@
 import os
 import sqlite3
 import threading
-import warnings
 
 from typing import Any, Dict, List, Tuple
 
 from .common import \
-    IDBCommon, DBWarnings, RetIndices, \
+    IDBCommon, RetIndices, \
     covert_to_sql_type, check_database_selected, check_data_field_type, \
     check_database_exists, check_table_exists
 
