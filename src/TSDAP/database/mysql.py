@@ -13,7 +13,7 @@ import pymysql
 import threading
 import warnings
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .common import \
     IDBCommon, DBWarnings, RetIndices, \
@@ -191,7 +191,7 @@ class MySQL(IDBCommon):
     @check_table_exists
     def select(self,
                table_name: str,
-               condition: str | None = None) -> Tuple[Tuple, List]:
+               condition: Optional[str] = None) -> Tuple[Tuple, List]:
 
         sql = SQL_DICT['select_data'].format(
             table_name=table_name,

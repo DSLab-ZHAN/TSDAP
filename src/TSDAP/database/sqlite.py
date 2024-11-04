@@ -13,7 +13,7 @@ import os
 import sqlite3
 import threading
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .common import \
     IDBCommon, RetIndices, \
@@ -152,7 +152,7 @@ class SQLite(IDBCommon):
     @check_table_exists
     def create_table(self,
                      table_name: str,
-                     column_infos: List[Tuple[str | Any]]) -> bool:
+                     column_infos: List[Tuple[str, Any]]) -> bool:
 
         columns = []
 
@@ -214,7 +214,7 @@ class SQLite(IDBCommon):
     @check_table_exists
     def select(self,
                table_name: str,
-               condition: str | None = None) -> Tuple[Tuple, List]:
+               condition: Optional[str] = None) -> Tuple[Tuple, List]:
 
         sql = SQL_DICT['select_data'].format(
             table_name=table_name,
