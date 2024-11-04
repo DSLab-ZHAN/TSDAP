@@ -12,7 +12,7 @@
 from datetime import datetime, timedelta
 from itertools import product
 from threading import Timer
-from typing import Any, Callable, Iterable, List, Mapping, Union
+from typing import Any, Callable, Iterable, List, Mapping, Optional, Union
 
 
 def parse_cron_field(field: str, min_val: int, max_val: int) -> List:
@@ -84,8 +84,8 @@ def get_next_run(cron_expression: str) -> Union[datetime, None]:
 
 def cron_to_timer(cron_expression: str,
                   task: Callable,
-                  args: Iterable[Any] | None = None,
-                  kwargs: Mapping[str, Any] | None = None) -> Union[Timer, None]:
+                  args: Optional[Iterable[Any]] = None,
+                  kwargs: Optional[Mapping[str, Any]] = None) -> Union[Timer, None]:
 
     next_run = get_next_run(cron_expression)
     if (next_run is None):
