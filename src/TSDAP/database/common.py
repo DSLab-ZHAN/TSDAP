@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from enum import IntEnum
 from decimal import Decimal
 from functools import wraps
-from typing import Any, Callable, Dict, List, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from TSDAP.utils.RWLock import WritePriorityReadWriteLock      # type: ignore
 
@@ -346,7 +346,7 @@ class IDBCommon(ABC):
 
     @abstractmethod
     # pragma: no cover
-    def select(self, table_name: str, condition: str | None = None) -> Tuple[Tuple, List]:
+    def select(self, table_name: str, condition: Optional[str] = None) -> Tuple[Tuple, List]:
         pass
 
     @abstractmethod
