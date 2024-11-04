@@ -10,15 +10,15 @@
 
 
 import re
-import warnings
+import logging
 
 from abc import ABC, abstractmethod
-from decimal import Decimal
 from enum import IntEnum
+from decimal import Decimal
 from functools import wraps
 from typing import Any, Callable, Dict, List, Tuple, Type
 
-from ..utils.RWLock import WritePriorityReadWriteLock
+from TSDAP.utils.RWLock import WritePriorityReadWriteLock      # type: ignore
 
 
 def covert_to_sql_type(value: Any) -> str:
@@ -68,7 +68,9 @@ def check_database_exists(func):
         operations = {
             "switch_database": {
                 "condition": not is_exists,
-                "action": lambda: warnings.warn(
+                "action": lambda: self._logger.warning(
+                    DBWarnings.DBNotExistsWarning(f"The `{database_name}` database not exists.")
+                ) if self._logger else logging.warning(
                     DBWarnings.DBNotExistsWarning(f"The `{database_name}` database not exists.")
                 ),
                 "result": False
@@ -81,7 +83,9 @@ def check_database_exists(func):
             },
             "create_database": {
                 "condition": is_exists,
-                "action": lambda: warnings.warn(
+                "action": lambda: self._logger.warning(
+                    DBWarnings.DBExistsWarning(f"The `{database_name}` database exists.")
+                ) if self._logger else logging.warning(
                     DBWarnings.DBExistsWarning(f"The `{database_name}` database exists.")
                 ),
                 "result": True
@@ -91,8 +95,11 @@ def check_database_exists(func):
         operation = operations.get(func.__name__)
 
         if operation and operation["condition"]:
-            operation["action"]()
+            operation["action"]()   # type: ignore
             return operation.get("result", None)
+
+        if (database_name not in self._type_map_for_tables):
+            self._type_map_for_tables[database_name] = {}
 
         return func(self, *args, **kwargs)
 
@@ -135,7 +142,9 @@ def check_table_exists(func):
                 # to ensure that the caller's subsequent code is not affected,
                 # regardless of whether the table already exists.
                 # When the table already exists, only one warning needs to be thrown
-                "action": lambda: warnings.warn(
+                "action": lambda: self._logger.warning(
+                    DBWarnings.TBExistsWarning(f"The '{table_name}' table exists in `{self._curr_database_name}`.")
+                ) if self._logger else logging.warning(
                     DBWarnings.TBExistsWarning(f"The '{table_name}' table exists in `{self._curr_database_name}`.")
                 ),
 
@@ -146,7 +155,7 @@ def check_table_exists(func):
         operation = operations.get(func.__name__)
 
         if operation and operation["condition"]:
-            operation["action"]()
+            operation["action"]()   # type: ignore
             return operation.get("result", None)
 
         return func(self, *args, **kwargs)
@@ -160,7 +169,11 @@ def check_data_field_type(func):
         # Check datatype
         status, err_pairs = self._check_datatype_correct(args[0], args[1])
         if (not status):
-            warnings.warn(DBWarnings.TypeMismatchedWarning(f"Error pairs info: {err_pairs}"))
+            if (self._logger is not None):
+                self._logger.warning(DBWarnings.TypeMismatchedWarning(f"Error pairs info: {err_pairs}"))    # pragma: no cover
+            else:
+                logging.warning(DBWarnings.TypeMismatchedWarning(f"Error pairs info: {err_pairs}"))
+
             return status
 
         status = func(self, *args, **kwargs)
@@ -180,13 +193,15 @@ class IDBCommon(ABC):
     def __init__(self) -> None:
         super(IDBCommon, self).__init__()
 
-        self._curr_database_name: str = None
+        self._curr_database_name: str | None = None
 
         self._type_map_for_tables: Dict[str, Dict] = {}
         self.__type_map_for_tables_lock = WritePriorityReadWriteLock()
 
-        self._database_exists_func: Callable[[], bool] = None
-        self._table_exists_func: Callable[[], bool] = None
+        self._database_exists_func: Callable[[str], bool] | None = None
+        self._table_exists_func: Callable[[str], bool] | None = None
+
+        self._logger: logging.Logger | None = None
 
     def __get_data_type(
             self,
@@ -203,20 +218,20 @@ class IDBCommon(ABC):
                 # If the value is a list, check the first element of the list to infer the type.
                 if value and isinstance(value[0], dict):
                     # If the elements in the list are dictionaries, recursively process the content in the dictionary.
-                    data_type_map[key] = [self.__get_data_type[value[0]]]
+                    data_type_map[key] = [self.__get_data_type[value[0]]]           # type: ignore
                 else:
-                    data_type_map[key] = [type(value[0])] if value else type(None)
+                    data_type_map[key] = [type(value[0])] if value else type(None)  # type: ignore
 
             else:
                 # Basic data type
-                data_type_map[key] = type(value)
+                data_type_map[key] = type(value)                                    # type: ignore
 
-        return data_type_map
+        return data_type_map                                                        # type: ignore
 
     def __compare_data_type_maps(
             self,
             data: Dict[str, Any],
-            type_map: Dict[str, Type]) -> Tuple[bool, List]:   # pragma: no cover
+            type_map: Dict[str, Type]) -> Tuple[bool, List]:   # pragma: no cover   # type: ignore
 
         err_pairs = []
         pos = ""
@@ -228,11 +243,10 @@ class IDBCommon(ABC):
                     if key in type_map.keys():
                         check(data[key], type_map[key], new_pos)
                     else:
-                        err_pairs.append({
-                            'pos': new_pos,
-                            'datatype': type(data[key]).__name__,
-                            'except': 'NoneType'
-                        })
+                        # Fields that do not exist in the type table will be skipped here to prevent them
+                        # from not being inserted during the first insertion. If the insertion is successful,
+                        # the type table will be automatically updated.
+                        continue
 
             elif (isinstance(data, list) and isinstance(type_map, list) and len(type_map) > 0):
                 list_item_type = type_map[0]
@@ -256,19 +270,19 @@ class IDBCommon(ABC):
 
     def _check_datatype_correct(self,
                                 table_name: str,
-                                data: Dict[str, Type]) -> Tuple[bool, List]:
+                                data: Dict[str, Type]) -> Tuple[bool, List | None]:
 
         self.__type_map_for_tables_lock.acquire_read()
 
-        correct_table_type = self._type_map_for_tables[table_name] \
-            if table_name in self._type_map_for_tables.keys() else None
+        correct_table_type = self._type_map_for_tables[self._curr_database_name][table_name] \
+            if table_name in self._type_map_for_tables[self._curr_database_name].keys() else None
 
         self.__type_map_for_tables_lock.release_read()
 
         # For the first submission, there is no corresponding type in the type mapping table,
         # and it is necessary to return True to obtain the corresponding type table.
         return self.__compare_data_type_maps(data, correct_table_type) \
-            if correct_table_type is not None else [True, None]
+            if correct_table_type is not None else (True, None)
 
     def _append_table_datatype_to_map(
             self,
@@ -277,14 +291,22 @@ class IDBCommon(ABC):
 
         self.__type_map_for_tables_lock.acquire_write()
 
-        self._type_map_for_tables[table_name] = self.__get_data_type(data)
+        if (table_name not in self._type_map_for_tables[self._curr_database_name]):
+            self._type_map_for_tables[self._curr_database_name][table_name] = {}
+
+        if (self._type_map_for_tables[self._curr_database_name][table_name].keys() != data.keys()):
+            # Different keys, update according to the replenishment strategy.
+            diff_keys = data.keys() - self._type_map_for_tables[self._curr_database_name][table_name].keys()
+            dtypes = self.__get_data_type(data)
+            for key in diff_keys:
+                self._type_map_for_tables[self._curr_database_name][table_name][key] = dtypes[key]
 
         self.__type_map_for_tables_lock.release_write()
 
-    def _register_database_exists_func(self, func: Callable[[], bool]):
+    def _register_database_exists_func(self, func: Callable[[str], bool]) -> None:
         self._database_exists_func = func
 
-    def _register_table_exists_func(self, func: Callable[[], bool]):
+    def _register_table_exists_func(self, func: Callable[[str], bool]) -> None:
         self._table_exists_func = func
 
     @abstractmethod
@@ -324,7 +346,7 @@ class IDBCommon(ABC):
 
     @abstractmethod
     # pragma: no cover
-    def select(self, table_name: str, condition: str = None) -> Any:
+    def select(self, table_name: str, condition: str | None = None) -> Tuple[Tuple, List]:
         pass
 
     @abstractmethod
@@ -334,7 +356,12 @@ class IDBCommon(ABC):
 
     @abstractmethod
     # pragma: no cover
-    def execute(self, sql: str, data: Tuple = None) -> Any:
+    def execute(self, sql: str, data: Tuple = ()) -> Tuple:
+        pass
+
+    @abstractmethod
+    # pragma: no cover
+    def transaction(self):
         pass
 
 
