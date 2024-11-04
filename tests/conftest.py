@@ -9,8 +9,14 @@
 '''
 
 
+import logging
 import os
 import sys
 
 
 sys.path.append(os.path.join('src'))
+logging.captureWarnings(True)
+
+
+def pytest_configure(config):
+    config.option.log_level = "WARNING"
