@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from enum import IntEnum
 from decimal import Decimal
 from functools import wraps
-from typing import Any, Callable, Dict, List, Tuple, Type
+from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
 from TSDAP.utils.RWLock import WritePriorityReadWriteLock      # type: ignore
 
@@ -270,7 +270,7 @@ class IDBCommon(ABC):
 
     def _check_datatype_correct(self,
                                 table_name: str,
-                                data: Dict[str, Type]) -> Tuple[bool, List | None]:
+                                data: Dict[str, Type]) -> Tuple[bool, Union[List, None]]:
 
         self.__type_map_for_tables_lock.acquire_read()
 
