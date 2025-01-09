@@ -1,0 +1,17 @@
+{
+    "infos":{
+        "name": "test_spider",
+        "tag": "1.0",
+        "desc": "Just a test_spider",
+        "author": "慕璃muri"
+    },
+    "runtimes":{
+        "entry": "test_spider",
+        "daemon": true,
+        "envs": {},
+        "dependencies": ["requests"]
+    },
+    "schedules":{
+        "cron": "0 0 * * * *"
+    }
+}

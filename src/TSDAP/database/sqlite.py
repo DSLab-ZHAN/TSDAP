@@ -81,10 +81,10 @@ class SQLite(IDBCommon):
 
         self.root_dir = root_dir
 
-        self._register_database_exists_func(self.__is_database_exists)
-        self._register_table_exists_func(self.__is_table_exists)
+        self._register_database_exists_func(self.is_database_exists)
+        self._register_table_exists_func(self.is_table_exists)
 
-    def __is_database_exists(self, database_name: str) -> bool:
+    def is_database_exists(self, database_name: str) -> bool:
         file_path = os.path.join(self.root_dir, f"{database_name}.db")
 
         if (os.path.isfile(file_path)):
@@ -93,7 +93,7 @@ class SQLite(IDBCommon):
 
         return False
 
-    def __is_table_exists(self, table_name: str) -> bool:
+    def is_table_exists(self, table_name: str) -> bool:
         sql = SQL_DICT['check_table_exists'].format(
             table_name=table_name
         )

@@ -61,7 +61,7 @@ def get_next_run(cron_expression: str) -> Union[datetime, None]:
     hours = parse_cron_field(hour_field, 0, 23)
     days = parse_cron_field(day_field, 1, 31)
     months = parse_cron_field(month_field, 1, 12)
-    weekdays = parse_cron_field(weekday_field, 0, 6)  # 0=Monday | 6=Sunday
+    weekdays = parse_cron_field(weekday_field, 0, 6)  # 0=Sunday | 6=Saturday
 
     # Search next match time
     for day_offset in range(0, 365):
@@ -71,7 +71,7 @@ def get_next_run(cron_expression: str) -> Union[datetime, None]:
         if (
             potential_time.month in months
             and potential_time.day in days
-            and potential_time.weekday() in weekdays
+            and ((potential_time.weekday() + 1) % 7) in weekdays
         ):
 
             for hour, minute, second in product(hours, minutes, seconds):
