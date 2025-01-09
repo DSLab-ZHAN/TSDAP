@@ -53,3 +53,7 @@ def covert_size_to_str(size_bytes: int) -> str:
         size_bytes /= threshold
 
     return f"{size_bytes:.2f} TB"
+
+
+def is_file_exists(file_path: str):
+    return os.path.exists(file_path)

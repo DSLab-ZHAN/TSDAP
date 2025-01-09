@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="arch.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.587745"
+     inkscape:cx="757.223"
+     inkscape:cy="393.77915"
+     inkscape:window-width="2560"
+     inkscape:window-height="1417"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="TriangleStart-5-3-3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-3-9-2" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleStart-5-3-3-1"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-3-9-2-7" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g622">
+      <g
+         id="g651">
+        <g
+           id="g2317">
+          <rect
+             style="fill:none;stroke:#000000;stroke-width:0.583999"
+             id="rect238"
+             width="43.965256"
+             height="42.942795"
+             x="143.75612"
+             y="71.469078"
+             ry="5.7257061" />
+          <text
+             xml:space="preserve"
+             style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:0px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';fill:none;stroke:#000000;stroke-width:0.583999"
+             x="152.93541"
+             y="94.426689"
+             id="text456"><tspan
+               sodipodi:role="line"
+               id="tspan454"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:none;stroke-width:0.584"
+               x="152.93541"
+               y="94.426689">时序预测平台</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g656"
+       transform="translate(4.1920471,-2.602726)">
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.583999"
+         id="rect238-4-5"
+         width="43.965256"
+         height="42.942795"
+         x="139.56407"
+         y="17.483852"
+         ry="5.7257061" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:0px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:none;stroke-width:0.583999"
+         x="153.05316"
+         y="40.441463"
+         id="text491-6"><tspan
+           sodipodi:role="line"
+           id="tspan489-1"
+           style="stroke-width:0.584"
+           x="153.05316"
+           y="40.441463">预测平台</tspan></text>
+    </g>
+    <g
+       id="g691"
+       transform="translate(2.5996715,-26.695292)">
+      <g
+         id="g496"
+         transform="translate(147.72736,-3.632225)">
+        <rect
+           style="fill:none;stroke:#000000;stroke-width:0.583999"
+           id="rect238-4"
+           width="43.965256"
+           height="42.942795"
+           x="65.821289"
+           y="75.101303"
+           ry="5.7257061" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:0px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:none;stroke-width:0.583999"
+           x="81.489059"
+           y="98.052711"
+           id="text491"><tspan
+             sodipodi:role="line"
+             id="tspan489"
+             style="stroke-width:0.584"
+             x="81.489059"
+             y="98.052711">数据库</tspan></text>
+      </g>
+      <g
+         id="g612"
+         transform="translate(147.72736,49.758358)">
+        <rect
+           style="fill:none;stroke:#000000;stroke-width:0.583999"
+           id="rect238-4-5-9"
+           width="43.965256"
+           height="42.942795"
+           x="65.821289"
+           y="75.101303"
+           ry="5.7257061" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:0px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:none;stroke-width:0.583999"
+           x="81.486992"
+           y="98.069252"
+           id="text491-6-3"><tspan
+             sodipodi:role="line"
+             id="tspan489-1-2"
+             style="stroke-width:0.584"
+             x="81.486992"
+             y="98.069252">模型库</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g617"
+       transform="translate(74.721886,32.51675)">
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.583999"
+         id="rect238-4-5-9-5"
+         width="43.965256"
+         height="42.942795"
+         x="7.5491376"
+         y="38.952328"
+         ry="5.7257061" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:0px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:none;stroke-width:0.583999"
+         x="21.0403"
+         y="61.920273"
+         id="text491-6-3-0"><tspan
+           sodipodi:role="line"
+           id="tspan489-1-2-8"
+           style="stroke-width:0.584"
+           x="21.0403"
+           y="61.920273">爬虫平台</tspan></text>
+    </g>
+    <g
+       id="g2659"
+       transform="translate(0,-1.864383)">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.619851;marker-start:url(#TriangleStart-5-3-3-1)"
+         d="m 189.3977,96.63848 26.19311,25.83311"
+         id="path828-0" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.619851;marker-start:url(#TriangleStart-5-3-3-1)"
+         d="M 189.45952,93.328208 215.29261,67.135094"
+         id="path828-0-4" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.413687;marker-end:url(#TriangleStart-5-3-3)"
+       d="m 165.04674,71.673354 0.15869,-12.237693"
+       id="path828-0-4-1" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.505316;marker-end:url(#TriangleStart-5-3-3-1)"
+       d="m 126.75525,92.758255 14.94826,0.193839"
+       id="path828-0-4-1-0" />
+  </g>
+</svg>

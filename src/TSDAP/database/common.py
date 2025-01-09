@@ -9,8 +9,8 @@
 '''
 
 
-import re
 import logging
+import re
 
 from abc import ABC, abstractmethod
 from enum import IntEnum
@@ -18,7 +18,7 @@ from decimal import Decimal
 from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
-from TSDAP.utils.RWLock import WritePriorityReadWriteLock      # type: ignore
+from utils.RWLock import WritePriorityReadWriteLock
 
 
 def covert_to_sql_type(value: Any) -> str:

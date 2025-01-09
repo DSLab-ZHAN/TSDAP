@@ -1,0 +1,19 @@
+{
+    "Runtimes":{
+        "DB_ROOT_DIR": "workspace/runtimes/db"
+    },
+
+    "Spiders":{
+        "PACKAGE_ROOT_DIR": "workspace/spider/packages",
+        "CONTAINER_ROOT_DIR": "workspace/spider/containers",
+
+        "THREAD_MAXIMUM": 16,
+
+        "WATCH_DOG_MAX_TIME": 60,
+
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": 3306,
+        "MYSQL_USER": "root",
+        "MYSQL_PASS": "password"
+    }
+}
