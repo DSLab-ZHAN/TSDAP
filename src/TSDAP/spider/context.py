@@ -248,16 +248,16 @@ class SpiderContext():
         return self.db_data.create_table(table_name, list(ref_data.items()))
 
     def _read_stores(self, name: str) -> Dict[str, Any] | None:
-        status, results = self.db_spider.select("stores", f"WHERE name={name}")
+        status, results = self.db_spider.select("stores", f"WHERE name='{name}'")
         if (len(results) != 0):
             return pickle.loads(base64.b64decode(results[0][1]))
 
         return None
 
     def _write_stores(self, name: str, store_data: Dict[str, Any]) -> bool:
-        status, results = self.db_spider.select("stores", f"WHERE name={name}")
+        status, results = self.db_spider.select("stores", f"WHERE name='{name}'")
         if (len(results) != 0):
-            self.db_spider.delete("stores", f"WHERE name={name}")
+            self.db_spider.delete("stores", f"WHERE name=`{name}`")
 
         return self.db_spider.insert("stores", {
             'name': name,
