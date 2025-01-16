@@ -89,7 +89,7 @@ class SpiderContext():
         self.spider_name = spider_name
 
         if (not self.spider_shares.is_daemon.get()):
-            self.watch_dog = Timer(ctx.multiprocess_get_global("Spiders.WATCH_DOG_MAX_TIME"), self._dog_trigger)
+            self.watch_dog = Timer(ctx.multiprocess_get_global("Spiders.WATCH_DOG_MAX_TIME"), self.__dog_trigger)
 
         self.db_data = MySQL(
             ctx.multiprocess_get_global("Spiders.MYSQL_HOST"),
@@ -130,14 +130,14 @@ class SpiderContext():
     def _feed_dog(self) -> None:
         if (not self.spider_shares.is_daemon.get()):
             self.watch_dog.cancel()
-            self.watch_dog = Timer(ctx.multiprocess_get_global("Spiders.WATCH_DOG_MAX_TIME"), self._dog_trigger)
+            self.watch_dog = Timer(ctx.multiprocess_get_global("Spiders.WATCH_DOG_MAX_TIME"), self.__dog_trigger)
             self.watch_dog.start()
 
-    def _dog_trigger(self) -> None:
+    def __dog_trigger(self) -> None:
         self.spider_shares.is_dog_trigger.set(True)
         self.spider_shares.is_stop_event.set()
 
-    def _copy_logs(self) -> None:
+    def __copy_logs(self) -> None:
         logs = self.spider_to_master_io.get_logs()
         self.spider_shares.logs.set(logs)
 
@@ -145,6 +145,7 @@ class SpiderContext():
         self._init_spider()
 
         if (not self.spider_shares.is_daemon.get()):
+            # Not daemon spider, stop it when it didn't do something
             self.watch_dog.start()
 
         # Context thread loop here
@@ -155,7 +156,7 @@ class SpiderContext():
                 self.__submit_queue()
 
             if (self.spider_shares.is_logs.get()):
-                self._copy_logs()
+                self.__copy_logs()
                 self.spider_shares.is_logs.set(False)
 
             if (self.spider_shares.is_stop_event.is_set()):
@@ -199,12 +200,25 @@ class SpiderContext():
 
         thread.start()
 
+    def __clean_dead_threads(self) -> None:
+        threads_to_remove = []
+        for thread_name, thread in self.spider_threads.items():
+            if (not thread.is_alive()):
+                threads_to_remove.append(thread_name)
+
+        # Delete recorded thread
+        for thread_name in threads_to_remove:
+            self.spider_threads.pop(thread_name)
+
     def _add_thread(self,
                     target_func: Callable,
                     thread_name: str | None = None,
                     args: Iterable[Any] = (),
                     kwargs: Mapping[str, Any] | None = None,
                     daemon: bool | None = None) -> Thread | None:
+
+        # Clean dead threads
+        self.__clean_dead_threads()
 
         if (len(self.spider_threads) > self.THREAD_MAXIMUM):
             self.logger.warning(
@@ -225,7 +239,7 @@ class SpiderContext():
         return thread
 
     def _push_data_to_queue(self, data: Tuple[str, Dict[str, Any]]) -> None:
-        self.queue.put(data, block=True)
+        self.queue.put(data)
 
     def _new_table(self,
                    table_name: str,
@@ -235,23 +249,34 @@ class SpiderContext():
 
     def _read_stores(self, name: str) -> Dict[str, Any] | None:
         status, results = self.db_spider.select("stores", f"WHERE name={name}")
-        if (status):
-            return pickle.loads(base64.b64decode(results))
+        if (len(results) != 0):
+            return pickle.loads(base64.b64decode(results[0][1]))
 
         return None
 
     def _write_stores(self, name: str, store_data: Dict[str, Any]) -> bool:
+        status, results = self.db_spider.select("stores", f"WHERE name={name}")
+        if (len(results) != 0):
+            self.db_spider.delete("stores", f"WHERE name={name}")
+
         return self.db_spider.insert("stores", {
             'name': name,
             'store_data': str(base64.b64encode(pickle.dumps(store_data)), 'utf-8')
         })
 
 
-def __import_from_path(module_name: str, file_path: str) -> ISpider | None:
-    spec = importlib.util.spec_from_file_location(module_name, file_path)
-    module = importlib.util.module_from_spec(spec)
+def __import_from_path(work_path: str, entry_relative_path: str, entry_filename: str) -> ISpider | None:
+    # Add work directory to sys.path
+    sys.path.insert(0, os.path.abspath(work_path))
+    sys.path.insert(0, os.path.abspath(os.path.join(work_path, entry_relative_path)))
 
-    sys.modules[module_name] = module
+    entry_fullpath = os.path.join(os.path.join(work_path, entry_relative_path), f"{entry_filename}.py")
+
+    spec = importlib.util.spec_from_file_location(entry_filename, entry_fullpath)
+    module = importlib.util.module_from_spec(spec)
+    module.__package__ = entry_relative_path
+
+    sys.modules[entry_filename] = module
     spec.loader.exec_module(module)
 
     sub_classes = ISpider.__subclasses__()
@@ -274,10 +299,10 @@ def __create_logger(db_insert_func: Callable[[str, str], None], virtual_io: Spid
 
 def __init_envs(envs: Dict[str, str]):
     for name, value in envs.items():
-        os.environ[name] = value
+        os.environ[name] = str(value)
 
 
-def context_main(entry_path: str,
+def context_main(context_infos: Dict[str, str],
                  envs: Dict[str, str],
                  _multiprocess_globals,
                  spider_shares) -> bool:
@@ -287,12 +312,21 @@ def context_main(entry_path: str,
 
     __init_envs(envs)
 
-    spider_name = os.path.split(entry_path)[-2]
+    spider_name = context_infos['container_name']
+    entry_file = context_infos['container_entry']
 
-    entry_file = os.path.split(entry_path)[-1][:-3]
+    entry_relative_path, entry_filename = os.path.split(entry_file)
+
+    work_path = os.path.join(
+        context_infos['container_root_dir'],
+        context_infos['container_id'],
+        context_infos['container_name']
+    )
+
     spider_cls = __import_from_path(
-        entry_file,
-        entry_path
+        work_path,
+        entry_relative_path,
+        entry_filename
     )
 
     if (spider_cls is None):
