@@ -35,7 +35,7 @@ def covert_to_sql_type(value: Any) -> str:
         return "Decimal"
 
     elif (isinstance(value, str)):
-        if (re.match(r"\b(?:(?:\d{4}\W\d{2}\W\d{2})|(?:\d{4}\d{2}\d{2}))\b", value)):
+        if (re.match(r"\b((19|20)?\d{2})([-/])((0[1-9]|1[0-2]))\3((0[1-9]|[12][0-9]|3[01]))\b", value)):
             return "DATE"
 
         if (re.match(r"\b(?:(\d{4})([^A-Za-z0-9\s])(\d{2})\2(\d{2}))[T\s]([01]\d|2[0-3]):[0-5]\d:[0-5]\d\b", value)):
