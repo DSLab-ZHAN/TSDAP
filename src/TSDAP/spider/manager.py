@@ -304,6 +304,9 @@ class SpiderManager():
         dependencies_index = column_names.index("Dependencies")
         default_entry = results[0][entry_index]
         default_daemon = results[0][daemon_index]
+
+        default_envs: Dict[str, str]
+        dependencies: List[str]
         default_envs = json.loads(results[0][envs_index])
         dependencies = json.loads(results[0][dependencies_index])
 
@@ -324,7 +327,7 @@ class SpiderManager():
 
         # Generate container name
         container_name = name
-        if (len(self.spider_manager_db.select("infos", f"WHERE Name='{name}'")[1]) == 0):
+        if (len(self.spider_manager_db.select("infos", f"WHERE Name='{name}'")[1]) != 0):
             container_name = generate_unique_docker_style_name()
 
         # Determine container configuration
@@ -339,9 +342,9 @@ class SpiderManager():
             container_daemon = default_daemon
 
         # Envs
-        container_envs = envs
-        if (envs is None):
-            container_envs = default_envs
+        container_envs = default_envs
+        if (envs is not None):
+            container_envs.update(envs)
 
         # Cron
         container_cron = cron
@@ -432,13 +435,14 @@ class SpiderManager():
         container_cron_index = column_names.index("Cron")
         container_cron = results[0][container_cron_index]
 
-        # Locate entry file full path
-        entry_path = os.path.join(
-            self.container_root_dir,
-            container_id,
-            container_name,
-            f"{container_entry}.py"
-        )
+        # Package all context infos
+        context_infos = {
+            'container_root_dir': self.container_root_dir,
+            'container_id': container_id,
+            'container_name': container_name,
+            'container_entry': container_entry
+        }
+
         db_path = os.path.join(
             self.container_root_dir,
             container_id,
@@ -453,7 +457,7 @@ class SpiderManager():
         process = Process(target=context_main,
                           name=f"spider_<{container_id}>_context",
                           args=(
-                              entry_path,
+                              context_infos,
                               container_envs,
                               ctx._multiprocess_globals,
                               spider_shares),
@@ -672,7 +676,9 @@ class SpiderManager():
             return
 
         id_index = column_names.index("ID")
+        name_index = column_names.index("Name")
         container_id = results[0][id_index]
+        container_name = results[0][name_index]
 
         # Read runtimes table
         column_names, results = self.spider_manager_db.select(
@@ -681,9 +687,7 @@ class SpiderManager():
         )
 
         status_index = column_names.index("Status")
-        entry_index = column_names.index("Entry")
         status = ContainerStatus(results[0][status_index])
-        entry = results[0][entry_index]
 
         if (status == ContainerStatus.RUNNING):
             # By invoke to process
@@ -707,7 +711,7 @@ class SpiderManager():
         )
 
         spider_db = SQLite(db_path)
-        spider_db.switch_database(entry)
+        spider_db.switch_database(container_name)
 
         column_names, results = spider_db.select("logs")
 
