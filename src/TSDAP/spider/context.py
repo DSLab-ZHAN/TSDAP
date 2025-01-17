@@ -21,7 +21,7 @@ from multiprocessing import Event
 from queue import Queue
 from time import sleep
 from threading import Thread, Timer
-from typing import Any, Callable, Dict, Iterable, Mapping, Tuple, Type
+from typing import Any, Callable, Dict, Iterable, Mapping, Tuple, Type,Optional,Union
 
 from database import MySQL, SQLite
 from runtime import RuntimeContext as ctx
@@ -30,11 +30,11 @@ from .common import SpiderCodes, SpiderShares
 from .spider import SpiderWarnings, ISpider
 
 
-DEFAULT_SPIDER_DIR: str | None = None
+DEFAULT_SPIDER_DIR: Optional[str] = None
 
 
 class SpiderVirtualIO(io.StringIO):
-    def __init__(self, initial_value: str | None = None, newline: str | None = None) -> None:
+    def __init__(self, initial_value: Union[str, None] = None, newline: Union[str, None] = None) -> None:
         super().__init__(initial_value, newline)
 
     def get_logs(self) -> str:
@@ -74,15 +74,15 @@ class SpiderContext():
                  ) -> None:
 
         self.spider_threads: Dict[str, Thread] = {}
-        self.logger: logging.Logger | None = None
+        self.logger: Union[logging.Logger, None] = None
         self.spider_to_master_io = SpiderVirtualIO()
 
         self.exception_occurred = Event()
 
-        self.queue: Queue[Tuple] = Queue(maxsize=100)
+        self.queue: Queue[tuple] = Queue(maxsize=100)
 
         self.user_spider_cls = user_spider_cls
-        self.thread_spider_main: 'ISpider' | None = None
+        self.thread_spider_main: Union['ISpider', None] = None
 
         self.spider_shares = spider_shares
 
@@ -212,10 +212,10 @@ class SpiderContext():
 
     def _add_thread(self,
                     target_func: Callable,
-                    thread_name: str | None = None,
+                    thread_name: Union[str, None] = None,
                     args: Iterable[Any] = (),
-                    kwargs: Mapping[str, Any] | None = None,
-                    daemon: bool | None = None) -> Thread | None:
+                    kwargs: Union[Mapping[str, Any], None] = None,
+                    daemon: Union[bool, None] = None) -> Union[Thread, None]:
 
         # Clean dead threads
         self.__clean_dead_threads()
@@ -247,7 +247,7 @@ class SpiderContext():
 
         return self.db_data.create_table(table_name, list(ref_data.items()))
 
-    def _read_stores(self, name: str) -> Dict[str, Any] | None:
+    def _read_stores(self, name: str) -> Union[Dict[str, Any], None]:
         status, results = self.db_spider.select("stores", f"WHERE name='{name}'")
         if (len(results) != 0):
             return pickle.loads(base64.b64decode(results[0][1]))
@@ -265,7 +265,7 @@ class SpiderContext():
         })
 
 
-def __import_from_path(work_path: str, entry_relative_path: str, entry_filename: str) -> ISpider | None:
+def __import_from_path(work_path: str, entry_relative_path: str, entry_filename: str) -> Union['ISpider', None]:
     # Add work directory to sys.path
     sys.path.insert(0, os.path.abspath(work_path))
     sys.path.insert(0, os.path.abspath(os.path.join(work_path, entry_relative_path)))

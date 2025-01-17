@@ -16,9 +16,10 @@ import shlex
 
 from runtime import RuntimeContext as ctx
 from spider import SpiderManager
+from typing import Optional
 
 
-spider_manager: SpiderManager | None = None
+spider_manager: Optional[SpiderManager] = None
 
 
 class MainConsole(cmd.Cmd):

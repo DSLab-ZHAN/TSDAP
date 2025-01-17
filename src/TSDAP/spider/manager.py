@@ -25,7 +25,7 @@ from multiprocessing import Manager, Process
 from tabulate import tabulate
 from time import sleep
 from threading import Lock, Thread
-from typing import Any, Dict, List
+from typing import Any, Dict, List,Optional
 
 from database import SQLite
 from utils.crontab import cron_to_timer
@@ -273,11 +273,12 @@ class SpiderManager():
 
     def run(self,
             pkg_name_tag: str,
-            name: str | None = None,
-            entry: str | None = None,
-            daemon: bool | None = None,
-            envs: Dict[str, str] | None = None,
-            cron: str | None = None) -> bool:
+            name: Optional[str] = None,
+            entry: Optional[str] = None,
+            daemon: Optional[bool] = None,
+            envs: Optional[Dict[str, str]] = None,
+            cron: Optional[str] = None) -> bool:
+
 
         combine = pkg_name_tag.split(':')
         if (len(combine) != 2):
@@ -326,8 +327,10 @@ class SpiderManager():
         container_created = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Generate container name
-        container_name = name
-        if (len(self.spider_manager_db.select("infos", f"WHERE Name='{name}'")[1]) != 0):
+        container_name=name
+        
+
+        if (len(self.spider_manager_db.select("infos", f"WHERE Name='{name}'")[1]) != 0) or (name is None):
             container_name = generate_unique_docker_style_name()
 
         # Determine container configuration
@@ -379,7 +382,8 @@ class SpiderManager():
         # Initialize container database
         os.mkdir(os.path.join(container_directory, "db"))
 
-        # Copy package code into container
+        # Copy package code into container  
+        
         shutil.copytree(
             os.path.join(self.pkg_root_dir, pkg_id),
             os.path.join(container_directory, container_name)

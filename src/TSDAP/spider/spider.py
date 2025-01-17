@@ -8,14 +8,13 @@
 @Desc    :   Spider Common Interface
 '''
 
-
 import logging
 import sys
 
 from abc import ABC, abstractmethod
 from functools import wraps
 from threading import Thread
-from typing import Any, Callable, Dict, Iterable, Mapping, TYPE_CHECKING
+from typing import Any, Callable, Dict, Iterable, Mapping, Optional, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -44,16 +43,16 @@ class ISpider(ABC):
     def __init__(self) -> None:
         super(ISpider, self).__init__()
 
-        self.context: 'SpiderContext' | None = None
-        self.logger: logging.Logger | None = None
+        self.context: Optional['SpiderContext'] = None
+        self.logger: Optional[logging.Logger] = None
 
     @spider_stop_checkpoint
     def alloc_thread(self,
                      target_func: Callable,
-                     thread_name: str | None = None,
+                     thread_name: Optional[str] = None,
                      args: Iterable[Any] = (),
-                     kwargs: Mapping[str, Any] | None = None
-                     ) -> Thread | None:
+                     kwargs: Optional[Mapping[str, Any]] = None
+                     ) -> Optional[Thread]:
 
         return self.context._add_thread(
             self._thread_task,
@@ -79,7 +78,7 @@ class ISpider(ABC):
 
         self.context._push_data_to_queue((table_name, data))
 
-    def read_stores(self, name: str) -> Dict[str, Any] | None:
+    def read_stores(self, name: str) -> Optional[Dict[str, Any]]:
         return self.context._read_stores(name)
 
     def write_stores(self, name: str, store_data: Dict[str, Any]) -> bool:
