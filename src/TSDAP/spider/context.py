@@ -21,7 +21,7 @@ from multiprocessing import Event
 from queue import Queue
 from time import sleep
 from threading import Thread, Timer
-from typing import Any, Callable, Dict, Iterable, Mapping, Tuple, Type,Optional,Union
+from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple, Type, Union
 
 from database import MySQL, SQLite
 from runtime import RuntimeContext as ctx
@@ -34,7 +34,7 @@ DEFAULT_SPIDER_DIR: Optional[str] = None
 
 
 class SpiderVirtualIO(io.StringIO):
-    def __init__(self, initial_value: Union[str, None] = None, newline: Union[str, None] = None) -> None:
+    def __init__(self, initial_value: Optional[str] = None, newline: Optional[str] = None) -> None:
         super().__init__(initial_value, newline)
 
     def get_logs(self) -> str:
